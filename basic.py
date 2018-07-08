@@ -36,7 +36,7 @@ class basic():
     
     def sign(self, COMM):
         # URL 순서를 필요한 대로 정리한다.
-        NEW_COMM = COMM.replace(' ', '%20').split('&')
+        NEW_COMM = COMM.lower().replace(' ', '%20').split('&')
         NEW_COMM.sort()
         NEW_COMM = '&'.join(NEW_COMM)
     
@@ -51,7 +51,7 @@ class basic():
     
     def push(self, service, comm):
         SERVICE = self.SERVICE + service
-        COMM = comm + '&apiKey' + self.API_KEY
+        COMM = comm + '&apiKey=' + self.API_KEY
 
         KT_API_URL = self.KT_API_URL.replace('VERSION', self.VERSION)
         KT_API_URL = KT_API_URL.replace('SERVICE', SERVICE)
