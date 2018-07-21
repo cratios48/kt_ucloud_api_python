@@ -5,9 +5,9 @@ import hmac
 import base64
 from urllib.parse import urlencode
 import requests
-from xml.etree.ElementTree import parse as xp
+import xml.etree.ElementTree as ET
 
-class basic():
+class Basic():
     KT_API_URL='https://api.ucloudbiz.olleh.com/SERVICE/VERSION/client/api?'
     SERVICE=('server',              # 서버 
                 'loadbalancer',     # 로드밸런서
