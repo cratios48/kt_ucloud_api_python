@@ -1,9 +1,13 @@
 #! /usr/bin/python3
 
+import sys
+
+sys.path.append('../')
+
 from basic import Basic
 import xml.etree.ElementTree as ET
 
-class Server(Basic):
+class Vm(Basic):
 
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, apikey, secretkey)
