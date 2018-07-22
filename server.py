@@ -9,9 +9,9 @@ class Server(Basic):
         super().__init__(zone, apikey, secretkey)
 
     def list(self):
-        raw_list = self.push('server', {'command': 'listVirtualMachines'})
+        rawList = self.push('server', {'command': 'listVirtualMachines'})
 
-        listRoot = ET.fromstring(raw_list)
+        listRoot = ET.fromstring(rawList)
 
         print('ZONE, NAME, TEMPLATE, IPs, PUBLIC IP, CREATED')
         for server in listRoot.findall('virtualmachine'):
@@ -23,5 +23,5 @@ class Server(Basic):
             template = server.find('template').text
             publicip = server.find('publicip').text
             created = server.find('created').text
-            print(zone, ', ', name, ', ', template, ', ', ips, ', ', publicip, ', ', created)
+            print(zone, name, template, ips, publicip, created, sep=', ')
 
