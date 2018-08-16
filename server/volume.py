@@ -23,6 +23,15 @@ class Volume(Basic):
             name = volume.find('name').text
             vmname = volume.find('vmdisplayname').text
             vmtype = volume.find('provisioningtype').text
-            size = volume.find('size').text
+            size = str(int(volume.find('size').text)/(1024*1024*1024)) + ' GB'
             created = volume.find('created').text
             print(zone, name, vmname, vmtype, size, created, sep=', ')
+
+    def checkId(self, volumeName):
+        rawList = self.push('server', {'command': 'listVolumes'})
+
+        listRoot = ET.fromstring(rawList)
+        
+        for volume in listRoot.findall('volume'):
+            if volume.find('name').text == volumeName:
+                return volume.find('id').text

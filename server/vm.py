@@ -28,4 +28,3 @@ class Vm(Basic):
             publicip = server.find('publicip').text
             created = server.find('created').text
             print(zone, name, template, ips, publicip, created, sep=', ')
-

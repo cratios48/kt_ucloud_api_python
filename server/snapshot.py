@@ -24,3 +24,48 @@ class Snapshot(Basic):
             name = snapshot.find('name').text
             size = str(round(int(snapshot.find('physicalsize').text)/(1024*1024), 2)) + ' MB'
             print(volume, created, name, size, sep=', ')
+
+    def create(self, volumeId):
+        result = self.push('server', {'command': 'createSnapshot', 'volumeid': volumeId})
+
+        resultRoot = ET.fromstring(result)
+
+        print('Job ID: ' + resultRoot.find('jobid').text)
+
+    def delete(self, snapshotId):
+        result = self.push('server', {'command': 'deleteSnapshot', 'id': snapshotId})
+
+        resultRoot = ET.fromstring(result)
+
+        print('Job ID: ' + resultRoot.find('jobid').text)
+
+    def checkId(self, target):
+        if isinstance(target, str):
+            result = self.push('server', {'command': 'listSnapshots'})
+
+            listRoot = ET.fromstring(result)
+
+            snapshotList = []
+
+            for snapshot in listRoot.findall('snapshot'):
+                if snapshot.find('volumename').text == target:
+                    snapshotList.append(snapshot.find('id').text)
+
+            return snapshotList
+        elif isinstance(target, (str, int)):
+            result = self.push('server', {'command': 'listSnapshots'})
+
+            listRoot = ET.fromstring(result)
+
+            snapshotList = [] 
+
+            for snapshot in listRoot.findall('snapshot'):
+                if snapshot.find('volumename').text == target:
+                    snapshotId = snapshot.find('id').text
+                    snapshotCreated = snapshot.find('created').text
+                    snapshotList.append([snapshotId, snapshotCreated])
+
+            return snapshotList
+        else:
+            print('Condition not matched.')
+            return None

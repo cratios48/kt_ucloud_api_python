@@ -8,7 +8,7 @@ from urllib.parse import urlencode
 import requests
 import xml.etree.ElementTree as ET
 
-class Basic(metaclass=ABCMeta):
+class Basic():
     KT_API_URL='https://api.ucloudbiz.olleh.com/SERVICE/VERSION/client/api?'
     SERVICE=('server',              # 서버 
                 'loadbalancer',     # 로드밸런서
@@ -61,7 +61,3 @@ class Basic(metaclass=ABCMeta):
         api_response = requests.get(KT_API_URL + urlencode(comm))
 
         return api_response.text
-
-    @abstractmethod
-    def list(self):
-        raise NotImplementedError('Method list must difined.')
