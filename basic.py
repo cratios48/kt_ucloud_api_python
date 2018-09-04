@@ -58,6 +58,10 @@ class Basic():
         KT_API_URL = self.KT_API_URL.replace('VERSION', self.VERSION)
         KT_API_URL = KT_API_URL.replace('SERVICE', SERVICE)
         
-        api_response = requests.get(KT_API_URL + urlencode(comm))
+        try:
+            api_response = requests.get(KT_API_URL + urlencode(comm))
+            result = json.loads(api_response.text)
+        except:
+            result = None
 
-        return json.loads(api_response)
+        return result

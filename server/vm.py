@@ -5,7 +5,7 @@ import sys
 sys.path.append('../')
 
 from basic import Basic
-import xml.etree.ElementTree as ET
+import json
 
 class Vm(Basic):
 
@@ -13,18 +13,19 @@ class Vm(Basic):
         super().__init__(zone, apikey, secretkey)
 
     def list(self):
-        rawList = self.push('server', {'command': 'listVirtualMachines'})
+        result = self.push('server', {'command': 'listVirtualMachines'})
 
-        listRoot = ET.fromstring(rawList)
-
-        print('ZONE, NAME, TEMPLATE, IPs, PUBLIC IP, CREATED')
-        for server in listRoot.findall('virtualmachine'):
-            ips = ''
-            for nic in server.findall('nic'):
-                ips += nic.find('ipaddress') + ' '
-            zone = server.find('zonename').text
-            name = server.find('displayname').text
-            template = server.find('template').text
-            publicip = server.find('publicip').text
-            created = server.find('created').text
-            print(zone, name, template, ips, publicip, created, sep=', ')
+        print('ZONE, NAME, TEMPLATE, IPs, PUBLIC IP, CREATED, CPU, MEMORY')
+        for vm in result['listvirtualmachineresponse']['virtualmachine']:
+            ipList = ''
+            zone = vm.get('zonename', default = None)
+            name = vm.get('displayname', default = None)
+            template = vm.get('templatedisplaytext', default = None)
+            publicip = vm.get('publicip', default = None)
+            created = vm.get('created', default = None)
+            cpu = vm.get('cpunumber', default = None)
+            mem = int(vm.get('memory')) / 1024
+            for nicNum in range(len(vm['nic'])):
+                ipList += vm['nic'][nicNum]['ipaddress'] + ' '
+            
+            print(zone, name, template, ipList, publicip, created, cpu, mem, sep = ', ')
