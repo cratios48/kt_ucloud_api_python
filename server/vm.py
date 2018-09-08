@@ -10,20 +10,20 @@ import json
 class Vm(Basic):
 
     def __init__(self, zone, apikey, secretkey):
-        super().__init__(zone, apikey, secretkey)
+        super().__init__(zone, 'server', apikey, secretkey)
 
     def list(self):
-        result = self.push('server', {'command': 'listVirtualMachines'})
+        result = self.push({'command': 'listVirtualMachines'})
 
         print('ZONE, NAME, TEMPLATE, IPs, PUBLIC IP, CREATED, CPU, MEMORY')
         for vm in result['listvirtualmachineresponse']['virtualmachine']:
             ipList = ''
-            zone = vm.get('zonename', default = None)
-            name = vm.get('displayname', default = None)
-            template = vm.get('templatedisplaytext', default = None)
-            publicip = vm.get('publicip', default = None)
-            created = vm.get('created', default = None)
-            cpu = vm.get('cpunumber', default = None)
+            zone = vm.get('zonename')
+            name = vm.get('displayname')
+            template = vm.get('templatedisplaytext')
+            publicip = vm.get('publicip')
+            created = vm.get('created')
+            cpu = vm.get('cpunumber')
             mem = int(vm.get('memory')) / 1024
             for nicNum in range(len(vm['nic'])):
                 ipList += vm['nic'][nicNum]['ipaddress'] + ' '

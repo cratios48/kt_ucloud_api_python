@@ -9,7 +9,7 @@ import json
 
 class Basic():
     KT_API_URL='https://api.ucloudbiz.olleh.com/SERVICE/VERSION/client/api?'
-    SERVICE=('server',              # 서버 
+    serviceList=('server',              # 서버 
                 'loadbalancer',     # 로드밸런서
                 'nas',              # NAS
                 'cdn',              # CDN
@@ -24,14 +24,17 @@ class Basic():
     VERSION = 'v1'
     SERVICE = ''
 
-    def __init__(self, TYPE, API_KEY, SECRET_KEY):
-        if TYPE.lower() == 'm2':
+    def __init__(self, ZONE, SERVICE, API_KEY, SECRET_KEY):
+        if ZONE.lower() == 'm2':
             self.VERSION = 'v2'
-        elif TYPE.lower() == 'gov':
+        elif ZONE.lower() == 'gov':
             self.SERVICE = 'g'
         else:
             pass
 
+        self.SERVICE += SERVICE
+        KT_API_URL = self.KT_API_URL.replace('VERSION', self.VERSION)
+        KT_API_URL = KT_API_URL.replace('SERVICE', SERVICE)
         self.API_KEY = API_KEY
         self.SECRET_KEY = SECRET_KEY
     
@@ -49,17 +52,13 @@ class Basic():
         
         return str(sign2, 'UTF-8')
     
-    def push(self, service, comm):
-        SERVICE = self.SERVICE + service
+    def push(self, comm):
         comm['response'] = 'json'
         comm['apiKey'] = self.API_KEY
         comm['signature'] = self.sign(comm)
-
-        KT_API_URL = self.KT_API_URL.replace('VERSION', self.VERSION)
-        KT_API_URL = KT_API_URL.replace('SERVICE', SERVICE)
         
         try:
-            api_response = requests.get(KT_API_URL + urlencode(comm))
+            api_response = requests.get(self.KT_API_URL + urlencode(comm))
             result = json.loads(api_response.text)
         except:
             result = None
