@@ -1,13 +1,9 @@
 #! /usr/bin/python3
 
-import sys
-
-sys.path.append('../')
-
 from basic import Basic
 import json
 
-class Vm(Basic):
+class Reseller(Basic):
 
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'server', apikey, secretkey)

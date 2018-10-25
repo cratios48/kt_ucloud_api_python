@@ -21,6 +21,7 @@ class Basic():
                 'watch',            # 모니터링
                 'gslb'              # GSLB
     )
+    ZONE = ''
     VERSION = 'v1'
     SERVICE = ''
 
@@ -32,9 +33,10 @@ class Basic():
         else:
             pass
 
+        self.ZONE = ZONE
         self.SERVICE += SERVICE
-        KT_API_URL = self.KT_API_URL.replace('VERSION', self.VERSION)
-        KT_API_URL = KT_API_URL.replace('SERVICE', SERVICE)
+        self.KT_API_URL = self.KT_API_URL.replace('VERSION', self.VERSION)
+        self.KT_API_URL = self.KT_API_URL.replace('SERVICE', self.SERVICE)
         self.API_KEY = API_KEY
         self.SECRET_KEY = SECRET_KEY
     
