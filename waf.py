@@ -9,11 +9,11 @@ class Waf(Basic):
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'waf', apikey, secretkey)
 
-    def rawList(self):
+    def rawListWaf(self):
         resultJson = self.push({'command': 'listWAFs'})
         return json.dumps(resultJson, indent=4, sort_keys=True)
 
-    def list(self):
+    def listWaf(self):
         resultJson = self.push({'command': 'listWAFs'})
         resultFormat = '{name},{zone},{ip},{port},{spec},{type},{active}\n'
 
@@ -69,7 +69,7 @@ class Waf(Basic):
                         waf = waf[0],
                         proxyPort = webServer.get('proxyport1'),
                         webServerPort = webServer.get('webserverport'),
-                        sslMode = webServer.get('sslmode')
+                        ssl = webServer.get('sslmode')
                     )
                 sleep(3)
         except:

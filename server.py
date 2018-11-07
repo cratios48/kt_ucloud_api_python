@@ -10,11 +10,11 @@ class Vm(Basic):
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'server', apikey, secretkey)
 
-    def rawList(self):
+    def rawListVm(self):
         resultJson = self.push({'command': 'listVirtualMachines'})
         return json.dumps(resultJson, indent = 4, sort_keys = True)
 
-    def list(self):
+    def listVm(self):
         resultJson = self.push({'command': 'listVirtualMachines'})
         resultFormat = '{zone},{name},{template},{ip},{publicip},{cpu},{mem},{created}\n'
 
@@ -49,7 +49,7 @@ class Volume(Basic):
         resultJson = self.push({'command': 'listVolumes'})
         return json.dumps(resultJson, indent = 4, sort_keys = True)
 
-    def list(self):
+    def listVolume(self):
         resultJson = self.push({'command': 'listVolumes'})
         resultFormat = '{zone},{name},{vmname},{vmtype},{size},{created}\n'
 
@@ -70,18 +70,24 @@ class Volume(Basic):
         return result
 
     def checkId(self, volumeName):
-        rawList = self.push({'command': 'listVolumes'})
+        resultJson = self.push({'command': 'listVolumes'})
+
+        for volume in resultJson['listvolumesresponse']['volume']:
+            if volume.get('name') == volumeName:
+                return volume.get('id')
+
+        return None
 
 class Snapshot(Basic):
 
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'server', apikey, secretkey)
 
-    def rawList(self):
+    def rawListSnapshot(self):
         resultJson = self.push({'command': 'listSnapshots'})
         return json.dumps(resultJson, indent = 4, sort_keys = True)
 
-    def list(self):
+    def listSnapshot(self):
         resultJson = self.push({'command': 'listSnapshots'})
         resultFormat = '{volume},{name},{id},{size},{created}\n'
 
@@ -90,10 +96,10 @@ class Snapshot(Basic):
             for snapshot in resultJson['listsnapshotsresponse']['snapshot']:
                 result += resultFormat.format(
                     volume = snapshot.get('volumename'),
-                    created = datetime.datetime.strptime(snapshot.get('created'), '%Y-%m-%dT%H:%M:%S%z').strftime('%Y-%m-%d'),
                     name = snapshot.get('name'),
-                    snapshotId = snapshot.get('id'),
-                    size = str(round(int(snapshot.get('physicalsize'))/(1024*1024), 2)) + ' MB'
+                    id = snapshot.get('id'),
+                    size = str(round(int(snapshot.get('physicalsize'))/(1024*1024), 2)) + ' MB',
+                    created = datetime.datetime.strptime(snapshot.get('created'), '%Y-%m-%dT%H:%M:%S%z').strftime('%Y-%m-%d %H:%M:%S')
                 )
         except:
             return result
@@ -103,36 +109,31 @@ class Snapshot(Basic):
     def create(self, volumeId):
         resultJson = self.push( {'command': 'createSnapshot', 'volumeid': volumeId})
 
-        print('Job ID: ' + resultJson.get('jobid'))
+        return resultJson.get('jobid')
 
     def delete(self, snapshotId):
         resultJson = self.push( {'command': 'deleteSnapshot', 'id': snapshotId})
 
-        print('Job ID: ' + resultJson.get('jobid'))
+        return resultJson.get('jobid')
 
-    def checkId(self, target):
-        if isinstance(target, str):
-            resultJson = self.push( {'command': 'listSnapshots'})
+    def checkId(self, volumeName):
+        resultJson = self.push({'command': 'listSnapshots'})
 
-            snapshotList = []
+        snapshotList = []
 
-            for snapshot in resultJson['listsnapshotresponse']['snapshot']:
-                if snapshot.get('volumename') == target:
-                    snapshotList.append(snapshot.find('id').text)
+        for snapshot in resultJson['listsnapshotsresponse']['snapshot']:
+            if snapshot.get('volumename') == volumeName:
+                snapshotList.append(snapshot.get('id'))
 
-            return snapshotList
-        elif isinstance(target, (str, int)):
-            resultJson = self.push( {'command': 'listSnapshots'})
+        return snapshotList
 
-            snapshotList = [] 
+    def checkIdCreate(self, volumeName):
+        resultJson = self.push({'command': 'listSnapshots'})
 
-            for snapshot in resultJson['listsnapshotresponse']['snapshot']:
-                if snapshot.get('volumename') == target:
-                    snapshotId = snapshot.get('id')
-                    snapshotCreated = snapshot.get('created')
-                    snapshotList.append([snapshotId, snapshotCreated])
+        snapshotList = []
 
-            return snapshotList
-        else:
-            print('Condition not matched.')
-            return None
+        for snapshot in resultJson['listsnapshotsresponse']['snapshot']:
+            if snapshot.get('volumename') == volumeName:
+                snapshotList.append([snapshot.get('id'), snapshot.get('created')])
+        
+        return snapshotList

@@ -9,11 +9,11 @@ class Nas(Basic):
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'nas', apikey, secretkey)
 
-    def rawList(self):
+    def rawListNas(self):
         resultJson = self.push({'command': 'listVolumes'})
         return json.dumps(resultJson, indent = 4, sort_keys = True)
 
-    def list(self):
+    def listNas(self):
         resultJson = self.push({'command': 'listVolumes'})
         resultFormat = '{name},{type},{ip},{path},{size},{status},{created},{autoresize}\n'
 
