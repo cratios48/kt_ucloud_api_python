@@ -15,7 +15,7 @@ class LB(Basic):
         resultJson = self.push({'command': 'listLoadBalancers'})
         return json.dumps(resultJson, indent=4, sort_keys=True)
 
-    def list(self):
+    def listLb(self):
         resultJson = self.push({'command': 'listLoadBalancers'})
         resultFormat = '{zone},{name},{ip},{port},{type},{option},{state},{hctype},{hcurl},{cert}\n'
         
@@ -27,10 +27,10 @@ class LB(Basic):
                     name = lb.get('name'),
                     ip = lb.get('serviceip'),
                     port = lb.get('serviceport'),
-                    type = lb.get('servicetype'),
+                    type = lb.get('servicetype').upper(),
                     option = lb.get('loadbalanceroption'),
                     state = lb.get('state'),
-                    hctype = lb.get('healthchecktype'),
+                    hctype = lb.get('healthchecktype').upper(),
                     hcurl = lb.get('healthcheckurl'),
                     cert = lb.get('certificatename')
                 )
@@ -67,7 +67,7 @@ class LB(Basic):
 
         try:
             result = resultFormat.format(lb = 'LB', server = 'SERVER', ip = 'IP', port = 'PORT')
-            for vm in json.loads(lbVm.rawList())['listvirtualmachinesresponse']['virtualmachine']:
+            for vm in json.loads(lbVm.rawListVm())['listvirtualmachinesresponse']['virtualmachine']:
                 vmIdList[vm.get('id')] = vm.get('displayname')
 
             resultJson = self.push({'command': 'listLoadBalancers'})
