@@ -54,6 +54,7 @@ class Reseller(Basic):
                     customerId = custom.get('emailid'),
                     serviceNumber = custom.get('servicenumber')
                 )
+                sleep(0.5)
         except:
             return result 
 
