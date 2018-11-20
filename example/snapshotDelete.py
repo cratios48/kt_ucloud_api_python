@@ -19,7 +19,7 @@ targetSsList = []
 for volume in targetVolList:
     tmpList = targetSs.checkIdCreate(volume)
     # Delete snapshot from oldest
-    tmpList.sort(lambda a: a[1], reverse=True)
+    tmpList.sort(key = lambda a: a[1], reverse=True)
     targetSsList += tmpList[count:]
     # To avoid KT API request time limit error.
     sleep(1)
