@@ -16,12 +16,12 @@ class Reseller(Basic):
         else:
             pass
 
-    def rawListMember(self):
+    def rawListsMember(self):
         resultJson = self.push({'command': 'memberInfo', 'resellerKey': self.resellerKey})
 
         return json.dumps(resultJson, indent=4, sort_keys=True)
 
-    def listMember(self):
+    def listsMember(self):
         resultJson = self.push({'command': 'memberInfo', 'resellerKey': self.resellerKey})
 
         memberList = []
@@ -31,8 +31,8 @@ class Reseller(Basic):
 
         return memberList
 
-    def rawListServiceNumber(self):
-        memberList = self.listMember()
+    def rawListsServiceNumber(self):
+        memberList = self.listsMember()
         idList = {}
         idList['id'] = []
 
@@ -42,8 +42,8 @@ class Reseller(Basic):
 
         return json.dumps(idList, indent=4, sort_keys=True)
 
-    def listServiceNumber(self):
-        memberList = self.listMember()
+    def listsServiceNumber(self):
+        memberList = self.listsMember()
         resultFormat = '{customerId},{serviceNumber}\n'
 
         try:
@@ -58,4 +58,14 @@ class Reseller(Basic):
         except:
             return result 
 
+        return result
+
+    def listsID(self, serviceNumber):
+        numberList = json.loads(self.rawListsServiceNumber())
+        result = 'No email has this service number - ' + serviceNumber
+
+        for number in numberList['id']:
+            if number['servicenumberresponse']['servicenumber'] == serviceNumber: 
+                result = number['servicenumberresponse']['emailid']
+        
         return result
