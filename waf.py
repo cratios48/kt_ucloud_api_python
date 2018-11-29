@@ -1,19 +1,19 @@
 #! /usr/bin/python3
 
 from basic import Basic
-import json
 from time import sleep
+import json
 
 class Waf(Basic):
 
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'waf', apikey, secretkey)
 
-    def rawListWaf(self):
+    def listsRaw(self):
         resultJson = self.push({'command': 'listWAFs'})
         return json.dumps(resultJson, indent=4, sort_keys=True)
 
-    def listWaf(self):
+    def lists(self):
         resultJson = self.push({'command': 'listWAFs'})
         resultFormat = '{name},{zone},{ip},{port},{spec},{type},{active}\n'
 
@@ -34,7 +34,7 @@ class Waf(Basic):
 
         return result
 
-    def rawListWebservers(self):
+    def listsRawWebservers(self):
         wafList = []
         
         try:
@@ -52,7 +52,7 @@ class Waf(Basic):
 
         return webserverList
 
-    def listWebservers(self):
+    def listsWebservers(self):
         wafList = []
         resultFormat = '{waf},{proxyport},{serverport},{ssl}\n'
         

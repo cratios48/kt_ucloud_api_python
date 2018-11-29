@@ -11,11 +11,11 @@ class LB(Basic):
     def __init__(self, zone, apiKey, secretKey):
         super().__init__(zone, 'loadbalancer', apiKey, secretKey)
 
-    def rawList(self):
+    def listsRaw(self):
         resultJson = self.push({'command': 'listLoadBalancers'})
         return json.dumps(resultJson, indent=4, sort_keys=True)
 
-    def listLb(self):
+    def lists(self):
         resultJson = self.push({'command': 'listLoadBalancers'})
         resultFormat = '{zone},{name},{ip},{port},{type},{option},{state},{hctype},{hcurl},{cert}\n'
         
@@ -39,7 +39,7 @@ class LB(Basic):
         
         return result
 
-    def rawResourceList(self):
+    def listsRawResource(self):
         lbNameList = []
         resourceList = []
 
@@ -59,7 +59,7 @@ class LB(Basic):
 
         return resourceList
 
-    def resourceList(self):
+    def listsReosource(self):
         lbVm = Vm(self.ZONE, self.API_KEY, self.SECRET_KEY)
         lbList = []
         vmIdList = {}
@@ -67,7 +67,7 @@ class LB(Basic):
 
         try:
             result = resultFormat.format(lb = 'LB', server = 'SERVER', ip = 'IP', port = 'PORT')
-            for vm in json.loads(lbVm.rawListVm())['listvirtualmachinesresponse']['virtualmachine']:
+            for vm in json.loads(lbVm.listsRaw())['listvirtualmachinesresponse']['virtualmachine']:
                 vmIdList[vm.get('id')] = vm.get('displayname')
 
             resultJson = self.push({'command': 'listLoadBalancers'})

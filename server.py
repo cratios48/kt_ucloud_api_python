@@ -2,7 +2,6 @@
 
 from basic import Basic
 import json
-import time
 import datetime
 
 class Vm(Basic):
@@ -10,11 +9,11 @@ class Vm(Basic):
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'server', apikey, secretkey)
 
-    def rawListVm(self):
+    def listsRaw(self):
         resultJson = self.push({'command': 'listVirtualMachines'})
         return json.dumps(resultJson, indent = 4, sort_keys = True)
 
-    def listVm(self):
+    def lists(self):
         resultJson = self.push({'command': 'listVirtualMachines'})
         resultFormat = '{zone},{name},{template},{ip},{publicip},{cpu},{mem},{created}\n'
 
@@ -45,11 +44,11 @@ class Volume(Basic):
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'server', apikey, secretkey)
     
-    def rawList(self):
+    def listsRaw(self):
         resultJson = self.push({'command': 'listVolumes'})
         return json.dumps(resultJson, indent = 4, sort_keys = True)
 
-    def listVolume(self):
+    def lists(self):
         resultJson = self.push({'command': 'listVolumes'})
         resultFormat = '{zone},{name},{vmname},{vmtype},{size},{created}\n'
 
@@ -61,7 +60,7 @@ class Volume(Basic):
                     name = volume.get('name'),
                     vmname = volume.get('vmdisplayname'),
                     vmtype = volume.get('provisioningtype'),
-                    size = str(int(volume.get('size'))/(1024*1024*1024)) + ' GB',
+                    size = str(int(volume.get('size'))/(1024**3)) + ' GB',
                     created = datetime.datetime.strptime(volume.get('created'), '%Y-%m-%dT%H:%M:%S%z').strftime('%Y-%m-%d %H:%M:%S'),
                 )
         except:
@@ -78,16 +77,27 @@ class Volume(Basic):
 
         return None
 
+    def serverVolume(self, server):
+        resultJson = self.push({'command': 'listVolumes'})
+
+        volList = []
+
+        for volume in resultJson['listvolumesresponse']['volume']:
+            if volume.get('vmdisplayname') == server:
+                volList.append(volume.get('id'))
+
+        return volList
+
 class Snapshot(Basic):
 
     def __init__(self, zone, apikey, secretkey):
         super().__init__(zone, 'server', apikey, secretkey)
 
-    def rawListSnapshot(self):
+    def listsRaw(self):
         resultJson = self.push({'command': 'listSnapshots'})
         return json.dumps(resultJson, indent = 4, sort_keys = True)
 
-    def listSnapshot(self):
+    def lists(self):
         resultJson = self.push({'command': 'listSnapshots'})
         resultFormat = '{volume},{name},{id},{size},{created}\n'
 
@@ -98,7 +108,7 @@ class Snapshot(Basic):
                     volume = snapshot.get('volumename'),
                     name = snapshot.get('name'),
                     id = snapshot.get('id'),
-                    size = str(round(int(snapshot.get('physicalsize'))/(1024*1024), 2)) + ' MB',
+                    size = str(round(int(snapshot.get('physicalsize'))/(1024**2), 2)) + ' MB',
                     created = datetime.datetime.strptime(snapshot.get('created'), '%Y-%m-%dT%H:%M:%S%z').strftime('%Y-%m-%d %H:%M:%S')
                 )
         except:
