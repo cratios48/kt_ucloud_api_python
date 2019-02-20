@@ -18,7 +18,9 @@ class Nas(Basic):
         resultFormat = '{name},{type},{ip},{path},{size},{usage},{status},{created},{autoresize}\n'
 
         try:
-            result = resultFormat.format(name = 'NAME', type = 'TYPE', ip = 'IP', path = 'PATH', size = 'SIZE', usage = 'USAGE', status = 'STATUS', created = 'CREATED', autoresize = 'AUTO RESIZE')
+            result = resultFormat.format(name = 'NAME', type = 'TYPE', ip = 'IP', 
+                                            path = 'PATH', size = 'SIZE (GiB)', usage = 'USAGE (GiB)', status = 'STATUS', 
+                                            created = 'CREATED', autoresize = 'AUTO RESIZE')
             for nas in resultJson['listvolumesresponse']['response']:
                 result += resultFormat.format(
                     name = nas.get('name'),
@@ -26,7 +28,7 @@ class Nas(Basic):
                     ip = nas.get('ip'),
                     path = nas.get('path'),
                     size = int(nas.get('totalsize'))/(1024**3),
-                    usage = str(round(int(nas.get('usedsize'))/(1024**3),2)) + ' GiB' ,
+                    usage = str(round(int(nas.get('usedsize'))/(1024**3),2)),
                     status = nas.get('status'),
                     created = datetime.datetime.strptime(nas.get('created'), '%Y-%m-%dT%H:%M:%S').strftime('%Y-%m-%d %H:%M:%S'),
                     autoresize = nas.get('autoresize')
