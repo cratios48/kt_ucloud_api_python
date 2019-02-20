@@ -31,6 +31,14 @@ class Reseller(Basic):
 
         return memberList
 
+    def listServiceNumber(self, email):
+        comm = {}
+        comm['command'] = 'serviceNumber'
+        comm['resellerKey'] = self.resellerKey
+        comm['id'] = email
+
+        return self.push(comm)
+
     def rawListsServiceNumber(self):
         memberList = self.listsMember()
         idList = {}
@@ -54,8 +62,9 @@ class Reseller(Basic):
                     customerId = custom.get('emailid'),
                     serviceNumber = custom.get('servicenumber')
                 )
-                sleep(0.5)
+                sleep(2)
         except:
+            print("Error: API Server not respond.")
             return result 
 
         return result
@@ -69,3 +78,17 @@ class Reseller(Basic):
                 result = number['servicenumberresponse']['emailid']
         
         return result
+
+    def listCharges(self, emailid, startDate, endDate, requestType='billingInfoListAccounts'):
+        comm = {}
+        comm['command'] = 'listCharges'
+        comm['resellerkey'] = self.resellerKey
+
+        if emailid != '':
+            comm['emailid'] = emailid
+
+        comm['startDate'] = startDate
+        comm['endDate'] = endDate
+        comm['type'] = requestType
+
+        return json.dumps(self.push(comm), indent=4, sort_keys=4)
