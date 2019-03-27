@@ -15,10 +15,10 @@ class Waf(Basic):
 
     def lists(self):
         resultJson = self.push({'command': 'listWAFs'})
-        resultFormat = '{name},{zone},{ip},{port},{spec},{type},{active}\n'
+        resultFormat = '{name},{zone},{ip},{port},{spec},{wafType},{active}\n'
 
         try:
-            result = resultFormat.format(name = 'NAME', zone = 'ZONE', ip = 'IP', port = 'PORT', spec = 'SPEC', type = 'TYPE', active = 'ACTIVE STATE')
+            result = resultFormat.format(name = 'NAME', zone = 'ZONE', ip = 'IP', port = 'PORT', spec = 'SPEC', wafType = 'TYPE', active = 'ACTIVE STATE')
             for waf in resultJson['listwafsresponse']['wafservice']:
                 result += resultFormat.format(
                     name = waf.get('name'),
