@@ -1,7 +1,5 @@
 {
-    "key": {
-        "zone": "",
-        "apikey": "",
-        "secretkey": ""
-    }
+    "zone": "",
+    "apikey": "",
+    "secretkey": ""
 }
