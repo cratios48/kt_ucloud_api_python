@@ -8,11 +8,11 @@ class Reseller(Basic):
     resellerKey = ''
 
     def __init__(self, zone, apikey, secretkey, resellerkey):
-        super().__init__(zone, '', apikey, secretkey)
-        self.KT_API_URL='https://ucloudbiz.olleh.com/jv_ssl_key_openapi.jsp?'
+        Basic.__init__(self, zone, '', apikey, secretkey)
+        self.kt_api_url='https://ucloudbiz.olleh.com/jv_ssl_key_openapi.jsp?'
         self.resellerKey = resellerkey
-        if self.ZONE.lower() == 'gov':
-            self.KT_API_URL = self.KT_API_URL.replace('ucloudbiz', 'gov.ucloudbiz')
+        if self.zone.lower() == 'gov':
+            self.kt_api_url = self.kt_api_url.replace('ucloudbiz', 'gov.ucloudbiz')
         else:
             pass
 

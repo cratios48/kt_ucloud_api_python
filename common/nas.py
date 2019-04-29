@@ -7,7 +7,7 @@ import datetime
 class Nas(Basic):
 
     def __init__(self, zone, apikey, secretkey):
-        super().__init__(zone, 'nas', apikey, secretkey)
+        Basic.__init__(self, zone, 'nas', apikey, secretkey)
 
     def listsRaw(self):
         resultJson = self.push({'command': 'listVolumes'})

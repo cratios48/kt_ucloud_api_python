@@ -1,5 +1,7 @@
 #! /usr/bin/env python3
-
+"""
+KT uCloud Open API basic function
+"""
 import hashlib
 import hmac
 import base64
@@ -8,46 +10,41 @@ import requests
 import json
 
 class Basic():
-    KT_API_URL='https://api.ucloudbiz.olleh.com/SERVICE/VERSION/client/api?'
-    ZONE = ''
-    VERSION = 'v1'
-    SERVICE = ''
-    serviceList=('server',          # 서버 
-                'loadbalancer',     # 로드밸런서
-                'nas',              # NAS
-                'cdn',              # CDN
-                'autoscaling',      # 오토스케일링
-                'waf',              # WAF
-                'db',               # DB
-                'messaging',        # 메시징
-                'packaging',        # 패키징
-                'watch',            # 모니터링
-                'gslb'              # GSLB
-    )
+    """
+    KT uCloud service list
+    - server
+    - loadbalancer
+    - nas
+    - cdn
+    - autoscaling
+    - waf
+    - db
+    - messaging
+    - packaging
+    - watch
+    - gslb
+    """
+    kt_api_url='https://api.ucloudbiz.olleh.com/{service}/{version}/client/api?'
 
-    def __init__(self, ZONE, SERVICE, API_KEY, SECRET_KEY):
-        if ZONE.lower() == 'm2':
-            self.VERSION = 'v2'
-        elif ZONE.lower() == 'gov':
-            self.SERVICE = 'g'
-        else:
-            pass
-
-        self.ZONE = ZONE
-        self.SERVICE += SERVICE
-        self.KT_API_URL = self.KT_API_URL.replace('VERSION', self.VERSION)
-        self.KT_API_URL = self.KT_API_URL.replace('SERVICE', self.SERVICE)
-        self.API_KEY = API_KEY
-        self.SECRET_KEY = SECRET_KEY
+    def __init__(self, zone, service, api_key, secret_key):
+        version = 'v1'
+        if zone.lower() == 'm2':
+            version = 'v2'
+        elif zone.lower() == 'gov':
+            service = 'g' + service
+        self.zone = zone
+        self.kt_api_url = self.kt_api_url.format(service = service, version = version)
+        self.api_key = api_key
+        self.secret_key = secret_key
     
-    def sign(self, COMM):
-        # URL 순서를 필요한 대로 정리한다.
-        NEW_COMM = urlencode(COMM).replace('+', '%20').lower()
-        NEW_COMM = '&'.join(sorted(NEW_COMM.split('&')))
+    def sign(self, comm):
+        # Reorder URL path as needed
+        new_comm = urlencode(comm).replace('+', '%20').lower()
+        new_comm = '&'.join(sorted(new_comm.split('&')))
     
-        # URL을 필요한 대로 암호화한다.
-        key = bytes(self.SECRET_KEY, 'UTF-8')
-        message = bytes(NEW_COMM, 'UTF-8')
+        # Encrypt URL
+        key = bytes(self.secret_key, 'UTF-8')
+        message = bytes(new_comm, 'UTF-8')
     
         sign1 = hmac.new(key, message, hashlib.sha1).digest()
         sign2 = base64.b64encode(sign1)
@@ -56,11 +53,11 @@ class Basic():
     
     def push(self, comm):
         comm['response'] = 'json'
-        comm['apiKey'] = self.API_KEY
+        comm['apiKey'] = self.api_key
         comm['signature'] = self.sign(comm)
         
         try:
-            api_response = requests.get(self.KT_API_URL + urlencode(comm))
+            api_response = requests.get(self.kt_api_url + urlencode(comm))
             result = json.loads(api_response.text)
         except requests.exceptions.RequestException as e:
             print(e)

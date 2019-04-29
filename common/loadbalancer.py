@@ -5,11 +5,10 @@ from time import sleep
 from server import Vm
 import json
 
-
 class LB(Basic):
 
     def __init__(self, zone, apiKey, secretKey):
-        super().__init__(zone, 'loadbalancer', apiKey, secretKey)
+        Basic.__init__(self, zone, 'loadbalancer', apiKey, secretKey)
 
     def listsRaw(self):
         resultJson = self.push({'command': 'listLoadBalancers'})
@@ -20,7 +19,10 @@ class LB(Basic):
         resultFormat = '{zone},{name},{ip},{port},{type},{option},{state},{hctype},{hcurl},{cert}\n'
         
         try:
-            result = resultFormat.format(zone = 'ZONE', name = 'NAME', ip = 'IP', port = 'PORT', type = 'TYPE', option = 'option', state = 'state', hctype = 'Health Check Type', hcurl = 'Health Check URL', cert = 'Certification') 
+            result = resultFormat.format(zone = 'ZONE', name = 'NAME', ip = 'IP', 
+                                            port = 'PORT', type = 'TYPE', option = 'option', 
+                                            state = 'state', hctype = 'Health Check Type', 
+                                            hcurl = 'Health Check URL', cert = 'Certification') 
             for lb in resultJson['listloadbalancersresponse']['loadbalancer']:
                 result += resultFormat.format(
                     zone = lb.get('zonename'),
@@ -60,7 +62,7 @@ class LB(Basic):
         return resourceList
 
     def listsReosource(self):
-        lbVm = Vm(self.ZONE, self.API_KEY, self.SECRET_KEY)
+        lbVm = Vm(self.zone, self.api_key, self.secret_key)
         lbList = []
         vmIdList = {}
         resultFormat = '{lb},{server},{ip},{port}\n'

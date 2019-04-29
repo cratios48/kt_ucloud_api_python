@@ -1,25 +1,45 @@
 #! /usr/bin/python3
 
 from basic import Basic
-import json
+from prettytable import PrettyTable
 import datetime
-
+import json
 class Vm(Basic):
+    """
+    Create, Delete, Modify, Search KT uCloud vm resource
+    """
 
     def __init__(self, zone, apikey, secretkey):
-        super().__init__(zone, 'server', apikey, secretkey)
+        Basic.__init__(self, zone, 'server', apikey, secretkey)
+        self.lastCheck = datetime.datetime.now()
+        self.vmInfo = self.push({'command': 'listVirtualMachines'})
+
+    def __repr__(self):
+        self.checkInfo()
+        return json.dumps(self.vmInfo, indent=4, sort_keys=True)
+
+    def checkInfo(self):
+        """
+        Refresh info if last check time is more than 60 seconds ago
+        """
+        tmpCheck = datetime.datetime.now()
+
+        if (tmpCheck - self.lastCheck).total_seconds() > 60:
+            self.lastCheck = tmpCheck
+            self.vmInfo = self.push({'command': 'listVirtualMachines'})
 
     def listsRaw(self):
-        resultJson = self.push({'command': 'listVirtualMachines'})
-        return json.dumps(resultJson, indent = 4, sort_keys = True)
+        self.checkInfo()
+        return json.dumps(self.vmInfo, indent = 4, sort_keys = True)
 
     def lists(self):
-        resultJson = self.push({'command': 'listVirtualMachines'})
+        self.checkInfo()
+        tmpVmInfo = self.vmInfo
         resultFormat = '{zone},{name},{template},{ip},{publicip},{cpu},{mem},{created}\n'
 
         try:
             result = resultFormat.format(zone='ZONE', name='NAME', template='TEMPLATE', ip='IPs', publicip='PUBLIC IP', cpu='CPU', mem='MEMORY', created='CREATED')
-            for vm in resultJson['listvirtualmachinesresponse']['virtualmachine']:
+            for vm in tmpVmInfo['listvirtualmachinesresponse']['virtualmachine']:
                 ipList = ''
                 for nicNum in range(len(vm['nic'])):
                     ipList += vm['nic'][nicNum]['ipaddress'] + ' '
@@ -39,10 +59,37 @@ class Vm(Basic):
 
         return result
 
+    def listsTable(self):
+        resultJson = self.push({'command': 'listVirtualMachines'})
+        t = PrettyTable()
+
+        t.field_names = ['ZONE', 'NAME','TEMPLATE', 'IPs', 'PUBLIC IP', 'CPU', 'MEMORY', 'CREATED']
+
+        for vm in resultJson['listvirtualmachinesresponse']['virtualmachine']:
+            #try:
+            ipList = ''
+            for nicNum in range(len(vm['nic'])):
+                ipList += vm['nic'][nicNum]['ipaddress'] + ' '
+            ipList = ipList[:-1]
+            t.add_row([
+                vm.get('zonename'),
+                vm.get('displayname'),
+                vm.get('templatedisplaytext'),
+                ipList,
+                vm.get('publicip'),
+                vm.get('cpunumber'),
+                int(vm.get('memory')) / 1024,
+                datetime.datetime.strptime(vm.get('created'), '%Y-%m-%dT%H:%M:%S%z').strftime('%Y-%m-%d %H:%M:%S')
+            ])
+            #except:
+            #    pass
+
+        return t
+
 class Volume(Basic):
 
     def __init__(self, zone, apikey, secretkey):
-        super().__init__(zone, 'server', apikey, secretkey)
+        Basic.__init__(self, zone, 'server', apikey, secretkey)
     
     def listsRaw(self):
         resultJson = self.push({'command': 'listVolumes'})
@@ -91,7 +138,7 @@ class Volume(Basic):
 class Snapshot(Basic):
 
     def __init__(self, zone, apikey, secretkey):
-        super().__init__(zone, 'server', apikey, secretkey)
+        Basic.__init__(self, zone, 'server', apikey, secretkey)
 
     def listsRaw(self):
         resultJson = self.push({'command': 'listSnapshots'})

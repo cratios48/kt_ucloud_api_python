@@ -7,7 +7,7 @@ import json
 class Waf(Basic):
 
     def __init__(self, zone, apikey, secretkey):
-        super().__init__(zone, 'waf', apikey, secretkey)
+        Basic.__init__(self, zone, 'waf', apikey, secretkey)
 
     def listsRaw(self):
         resultJson = self.push({'command': 'listWAFs'})
